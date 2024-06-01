@@ -70,5 +70,5 @@ __Python scripting, Data Collection, Streamlit, API integration, Data Management
 ### Demo Video:
  YT URL: 
 ### Contact
-LINKEDIN :  www.linkedin.com/in/suryakarthik87           
-EMAIL:suryakarthik87@gmail.com
+🌐LINKEDIN :  www.linkedin.com/in/suryakarthik87           
+📧EMAIL:suryakarthik87@gmail.com
