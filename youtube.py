@@ -402,7 +402,7 @@ def comments_table(channel_name_s):
                         row['Video_Id'],
                         row['Comment_Text'],
                         row['Comment_Author'],
-                        row['Comment_Published'],
+                        row['Comment_Published']
                         )  
                 
                 
@@ -554,7 +554,6 @@ if selected == "View the Channel":
 #------------------------------------SELECT OPTION MENU : DATA HARVEST------------------------------------------------
 
 if  selected == "Data Harvest":
-    try:
         channel_id = st.text_input("Enter the YouTube Channel ID to Store:")
         st.button("Extract and Store")
         ch_ids = []
@@ -562,9 +561,9 @@ if  selected == "Data Harvest":
         coll = db["channel_details"]
         for ch_data in coll.find({},{"_id":0,"channel_information":1}):
             ch_ids.append(ch_data["channel_information"]["Channel_Id"])
-
-        if channel_id in ch_ids:
-            st.success("Channel Details of the Given channel id is already exists")
+        try:
+            if channel_id in ch_ids:
+                st.success("Channel Details of the Given channel id is already exists")
 
         else:
             insert = channel_details(channel_id)
@@ -574,7 +573,7 @@ if  selected == "Data Harvest":
         if e.resp.status == 403 and e.error_details[0]["reason"] == 'API Quota exceeded':
                     st.error(" API Quota exceeded. Please try again later.")
     except:
-        st.error("Please ensure to give valid channel ID")
+        st.error("Enter the Valid Channel Id")
 
 
 #-------------------------------------SELECT OPTION MENU : TRANSFER TO DATA WARHOUSE-------------------------------
