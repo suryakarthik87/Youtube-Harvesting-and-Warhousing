@@ -14,6 +14,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import plotly.express as px
 from PIL import Image
+from googleapiclient.errors import HttpError
 
 
 #-------------------------------------API KEY CONNECTION-------------------------------------
@@ -103,8 +104,7 @@ def get_video_info(video_ids):
                             Comments = item['statistics'].get('commentCount'),
                             Favorite_Count = item['statistics']['favoriteCount'],
                             Caption_Status = item['contentDetails']['caption'],
-                            Like_Count = item['statistics'].get('likeCount'),
-                            dislike_Count = item['statistics'].get('dislikeCount')
+                            Like_Count = item['statistics'].get('likeCount')
                             )
                 video_data.append(data)
     return video_data
@@ -229,16 +229,16 @@ def channels_table(channel_name_s):
                 row['Channel_Description'],
                 row['Playlist_Id'])
         
-        #try:
+        try:
 
-        cursor.execute(insert_query,values) 
-        mydb.commit()
+            cursor.execute(insert_query,values) 
+            mydb.commit()
 
-        #except:
+        except:
 
-            #news = f"You provided channel name {channel_name_s} is already exists"
+            news = f"You provided channel name {channel_name_s} is already exists"
 
-            #return news
+            return news
 
    
 
@@ -314,8 +314,8 @@ def videos_table(channel_name_s):
                                                             Comments int,
                                                             Favorite_Count int,
                                                             Caption_Status varchar(255),
-                                                            Like_Count int,
-                                                            dislike_Count int)'''
+                                                            Like_Count int
+                                                            )'''
     cursor.execute(create_query)
     mydb.commit()
 
@@ -341,10 +341,10 @@ def videos_table(channel_name_s):
                                                 Comments,
                                                 Favorite_Count,
                                                 Caption_Status,
-                                                Like_Count,
-                                                dislike_Count)
+                                                Like_Count
+                                                )
                                                     
-                                                values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
+                                                values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'''
             values =(row['Channel_Name'],
                     row['Channel_Id'],
                     row['Video_Id'],
@@ -358,8 +358,8 @@ def videos_table(channel_name_s):
                     row['Comments'],
                     row['Favorite_Count'],
                     row['Caption_Status'],
-                    row['Like_Count'],
-                    row['dislike_Count'])  
+                    row['Like_Count']
+                    )  
             
             
             cursor.execute(insert_query,values) 
@@ -412,13 +412,13 @@ def comments_table(channel_name_s):
 #------------------------------------------TABLE CREATION---------------------------
 def tables(single_channel):
     
-    channels_table(single_channel)
-    #if news:
-    #    return news
-    #else:
-    playlist_table(single_channel)
-    videos_table(single_channel)
-    comments_table(single_channel)
+    news = channels_table(single_channel)
+    if news:
+        return news
+    else:
+        playlist_table(single_channel)
+        videos_table(single_channel)
+        comments_table(single_channel)
 
     return "Tables created sucessfully"
 
@@ -554,20 +554,27 @@ if selected == "View the Channel":
 #------------------------------------SELECT OPTION MENU : DATA HARVEST------------------------------------------------
 
 if  selected == "Data Harvest":
-    channel_id = st.text_input("Enter the YouTube Channel ID to Store:")
-    st.button("Extract and Store")
-    ch_ids = []
-    db = client["Youtube_Details"]
-    coll = db["channel_details"]
-    for ch_data in coll.find({},{"_id":0,"channel_information":1}):
-        ch_ids.append(ch_data["channel_information"]["Channel_Id"])
+    try:
+        channel_id = st.text_input("Enter the YouTube Channel ID to Store:")
+        st.button("Extract and Store")
+        ch_ids = []
+        db = client["Youtube_Details"]
+        coll = db["channel_details"]
+        for ch_data in coll.find({},{"_id":0,"channel_information":1}):
+            ch_ids.append(ch_data["channel_information"]["Channel_Id"])
 
-    if channel_id in ch_ids:
-        st.success("Channel Details of the Given channel id is already exists")
+        if channel_id in ch_ids:
+            st.success("Channel Details of the Given channel id is already exists")
 
-    else:
-        insert = channel_details(channel_id)
-        st.success(insert)  
+        else:
+            insert = channel_details(channel_id)
+            st.success(insert)
+
+    except HttpError as e:
+        if e.resp.status == 403 and e.error_details[0]["reason"] == 'API Quota exceeded':
+                    st.error(" API Quota exceeded. Please try again later.")
+    except:
+        st.error("Please ensure to give valid channel ID")
 
 
 #-------------------------------------SELECT OPTION MENU : TRANSFER TO DATA WARHOUSE-------------------------------
