@@ -68,7 +68,7 @@ __Python scripting, Data Collection, Streamlit, API integration, Data Management
 * Select Analysis and Visualization options from the sidebar menu to analyze and visualize data.
 
 ### Demo Video:
- YT URL: https://www.youtube.com/watch?v=S65_NgXTUto
+ YT URL: https://www.youtube.com/watch?v=zbwv6MqHODM
 ### Contact
 🌐LINKEDIN :  www.linkedin.com/in/suryakarthik87           
 📧EMAIL:suryakarthik87@gmail.com
